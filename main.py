@@ -192,7 +192,7 @@ class MyUtils:
         :raise Exception: ``exc`` general error: check permissions and directory path / status manually
         """
         try:
-            path = Path(f"{c.LOGS_DIR}\\TI scanner")
+            path = Path(f"{c.LOGS_DIR}\\TI RSS notifier")
             path.mkdir(parents=True, exist_ok=True)
             return True
         except Exception as exc:
