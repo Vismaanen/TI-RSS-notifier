@@ -74,4 +74,4 @@ Full license text can be found in file: [LICENSE](./LICENSE).
 
 ---
 
-© 2025 **Vismaanen** — simple conding for simple life
+© 2025 **Vismaanen** — simple coding for simple life
