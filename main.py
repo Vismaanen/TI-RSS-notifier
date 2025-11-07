@@ -23,8 +23,10 @@ Major updates:
 
 # default imports
 import re
+import sys
 import time
 import socket
+import certifi
 import smtplib
 import logging
 import argparse
@@ -169,7 +171,7 @@ class MyUtils:
                 ))
                 logger.addHandler(file_handler)
                 # console output handler setting
-                console_handler = logging.StreamHandler()
+                console_handler = logging.StreamHandler(sys.stdout)
                 console_handler.setFormatter(logging.Formatter(
                     '%(asctime)s - %(levelname)s - %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S'
@@ -197,8 +199,6 @@ class MyUtils:
             print(f'Exception while setting up script directories. Verify script permissions. {str(exc)}')
             return False
     # endregion
-
-
 
     @staticmethod
     def send_simple_mail(html_body: str, subject: str, log: logging.Logger) -> None:
@@ -270,7 +270,7 @@ class MyReceiver:
             return None
         # attempt to execute a request
         try:
-            response = requests.get(url, headers=self.headers, timeout=25)
+            response = requests.get(url, headers=self.headers, timeout=25, verify=False)  # USE THIS INTERNALLY
             if response.status_code == 200:
                 self.log.info(f'> ok: {url}')
                 return response
@@ -612,7 +612,7 @@ class MyScanner:
                     found_sentences.append(context)
                     break
         # volume and duplicate check
-        # NOTE 27.10.2025 added to ensure no duplicate findings
+        # added to ensure no duplicate findings
         if not found_sentences:
             return None
         else:
@@ -768,7 +768,7 @@ class MyScanner:
 
 class MyReporter:
     """
-    SQL data upload handling and report building class
+    SQL data upload handling and report building class.
     """
 
     def __init__(self, log: logging.Logger, db_conn: pyodbc.Connection, utils: MyUtils):
@@ -915,7 +915,7 @@ class MyReporter:
         :type article_list: list[Any]
         :type cve_list: list[Any]
         :return: dictionary of articles matching report scope, optional
-        :rtype: dict[str, ANy] or None
+        :rtype: dict[str, Any] or None
         :raise Exception: generic code exception
         """
         try:
@@ -1071,16 +1071,15 @@ class MyReporter:
         self.log.info('report delivery')
         # depending on a report prepare matching subject and email greeting
         if mode == 'cves':
-            subject = f'[ECS TI] 🟧 CVE-related news'
+            subject = f'[TI] 🔶 CVE-related news'
             body = f'please find recent articles related to CVEs attached below: </ br>{report_code}'
         elif mode == 'prio':
-            subject = f'[ECS TI] 🟠 PRIO!: customer-related news'
+            subject = f'[TI] 🔴 PRIO!: customer-related news'
             body = f'please find recent articles related to serviced customers attached below: </ br>{report_code}'
         else:
-            subject = f'[ECS TI] 🔶 RSS news matching interests'
+            subject = f'[TI] 🟩 RSS news matching interests'
             body = f'please find recent articles related to monitored interests attached below: </ br>{report_code}'
         # call sender class, execute sending
-
         self.log.info('calling email sender module')
         self.utils.send_simple_mail(body, subject, self.log)
         return
@@ -1244,21 +1243,24 @@ class MyHTML:
     @staticmethod
     def emphasize_keywords(text: str, keywords: list[str]) -> str:
         """
-        Add ``<strong></strong>`` near each priority keywords in a given article piece.
+        Add distinct style near each priority keywords in a given article piece.
 
         :param str text: article piece string
         :param keywords: priority keywords found in an article
         :type keywords: list[str]
-        :return:
+        :return: modified htmls string with visually highlighted keywords
+        :rtype: str
         """
         # if no keywords for some reason - return original text
         if not keywords:
             return text
+        # style: background highlight
+        style = "font-weight:bold; background-color:rgb(255,255,0);"
         # attempt to pin-pint matching phrases in details, avoiding parts of words
         escaped = sorted((re.escape(k) for k in keywords), key=len, reverse=True)
         pattern = re.compile(r'\b(?:' + '|'.join(escaped) + r')\b', flags=re.IGNORECASE)
         # return modified code
-        return pattern.sub(lambda val: f"<strong>{val.group(0)}</strong>", text)
+        return pattern.sub(lambda val: f"<strong><span style='{style}'>{val.group(0)}</span></strong>", text)
 
 
 def main(**kwargs: dict) -> None:
