@@ -8,7 +8,7 @@ from popular web sources writing about IT security. Script can be run manually f
 scheduler for a timed runs.
 
 ## ⚙️ Main functionalities
-___
+
 Script perform four separate actions:
 
 - check-up of configured web sources for new articles, scrapping and uploading parsed content into local SQL database,
@@ -19,7 +19,7 @@ Script perform four separate actions:
 These functionalities are described in detail in the following sections of this instruction.
 
 ## ➕ Dependencies
-___
+
 To run, script requires an SQL database with two tables:
 
 - data_ti_articles: main table to store articles data,
@@ -32,7 +32,7 @@ Additional libraries are also required; use provided link to obtain those:
 Script logs all actions locally in a ``LOGS_DIR`` configurable location - set in a ``config`` file.
 
 ## 🌐 External resources
-___
+
 Script operates on accessing various sources through ``https://``. Default supported TI sources as follows:
 
 - BleepingComputer
@@ -46,7 +46,7 @@ details for CVEs mentioned within articles. These details are then being uploade
 use as a reference.
 
 ## 🏃‍♂️‍➡️ Running script
-___
+
 Script can be run by providing --mode argument. Available modes:
 
 - ``scan`` perform a lookup on RSS articles:
@@ -61,14 +61,14 @@ Script can be run by providing --mode argument. Available modes:
 - ``news`` create a report containing all other articles, not related to customer keywords or CVEs.
 
 ## 📝 Annotations
-___
+
 - No duplicate article deliveries: each article forwarded within a report is being marked in a database table with a delivery timestamp,
 - Logging: each issue with a script is being logged for a review,
 - SQL table queries are available within ``\sql`` directory.,
 - No API key is required for a communication with NIST, unless there are larger volume of queries expected.
 
 ## 📜 License
-___
+
 Project is available under terms of **[Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)**.  
 Full license text can be found in file: [LICENSE](./LICENSE).
 
